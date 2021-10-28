@@ -1,0 +1,27 @@
+<sw-tabs-item title="Tabs">
+    <div>
+        <sw-data-grid
+                class="sw-product-tabs__data-grid"
+                :dataSource="dataSource"
+                :columns="columns">
+
+            {% block sw_product_tabs_actions %}
+                <template slot="actions" slot-scope="{ item }">
+
+                    {% block sw_product_tabs_actions_items %}
+                        <sw-context-menu-item @click="onEdit(item)">
+                            Edit
+                        </sw-context-menu-item>
+
+                        <sw-context-menu-item @click="onDelete(item)">
+                            Delete
+                        </sw-context-menu-item>
+                    {% endblock %}
+
+                </template>
+            {% endblock %}
+
+        </sw-data-grid>
+    </div>
+
+</sw-tabs-item>
