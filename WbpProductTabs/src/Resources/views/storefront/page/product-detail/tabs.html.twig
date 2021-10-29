@@ -48,7 +48,7 @@
                             {% block page_product_detail_tabs_navigation_review %}
                                 {% if config('core.listing.showReview') %}
                                     <li class="nav-item">
-                                        <a class="nav-link {% if (ratingSuccess == 1) or (ratingSuccess == -1) %}active{% endif %} product-detail-tab-navigation-link"
+                                        <a class="nav-link {% if (ratingSuccess == 1) or (ratingSuccess == -1) or (page.extensions.description.visibility == 0) %}active{% endif %} product-detail-tab-navigation-link"
                                            id="review-tab"
                                            data-toggle="tab"
                                            data-offcanvas-tabs="true"
@@ -94,7 +94,7 @@
 
                             {% block page_product_detail_tabs_content_review %}
                                 {% if config('core.listing.showReview') %}
-                                    <div class="tab-pane fade show {% if (ratingSuccess == 1) or (ratingSuccess == -1) %}active{% endif %}"
+                                    <div class="tab-pane fade show {% if (ratingSuccess == 1) or (ratingSuccess == -1) or(page.extensions.description.visibility == 0)%}active{% endif %}"
                                          id="review-tab-pane"
                                          role="tabpanel"
                                          aria-labelledby="review-tab">

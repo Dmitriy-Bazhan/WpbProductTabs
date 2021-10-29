@@ -1,0 +1,18 @@
+@import "~scss/variables";
+@import "~scss/mixins";
+
+.sw-card {
+  margin: 0 200px;
+}
+
+.wbp_product_tabs_list_toolbar_wrapper {
+  .sw-card__title {
+    max-width: 100px !important;
+  }
+
+  .sw-card__content {
+
+    width: 1200px !important;
+  }
+
+}

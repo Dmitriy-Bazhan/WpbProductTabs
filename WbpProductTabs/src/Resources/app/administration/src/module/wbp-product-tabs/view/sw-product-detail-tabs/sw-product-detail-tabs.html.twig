@@ -1,27 +1,97 @@
-<sw-tabs-item title="Tabs">
-    <div>
-        <sw-data-grid
-                class="sw-product-tabs__data-grid"
-                :dataSource="dataSource"
-                :columns="columns">
+<sw-card title="Tabs" class="wbp_product_tabs_list_toolbar_wrapper">
 
-            {% block sw_product_tabs_actions %}
-                <template slot="actions" slot-scope="{ item }">
+    {% block wbp_product_tabs_list_toolbar %}
 
-                    {% block sw_product_tabs_actions_items %}
-                        <sw-context-menu-item @click="onEdit(item)">
-                            Edit
-                        </sw-context-menu-item>
+        <div class="sw-configuration-option-list__toolbar">
 
-                        <sw-context-menu-item @click="onDelete(item)">
-                            Delete
-                        </sw-context-menu-item>
+            {% block wbp_product_tabs_list_toolbar_container %}
+
+                <sw-container
+                        columns="1fr minmax(50px, 100px) minmax(50px, 1250px)"
+                        gap="0 10px"
+                >
+
+                    {% block wbp_product_tabs_list_toolbar_buttons %}
+                        <sw-button
+                                v-tooltip=""
+                                @click="addNewTab()"
+                        >
+                            Add New Tabs
+                        </sw-button>
+
                     {% endblock %}
 
-                </template>
+                </sw-container>
+
             {% endblock %}
 
-        </sw-data-grid>
-    </div>
+        </div>
 
-</sw-tabs-item>
+    {% endblock %}
+
+    <sw-data-grid
+            class="sw-product-tabs__data-grid"
+            :dataSource="dataSource"
+            :columns="columns"
+            :show-selection="false"
+    >
+        {% block wbp_product_tabs_is_enabled %}
+            <template
+                    slot="column-isEnabled"
+                    slot-scope="{ item }"
+            >
+                <template>
+                    <sw-icon
+                            v-if="item.isEnabled === 1"
+                            name="small-default-checkmark-line-medium"
+                            small
+                            class="is--active"
+                            @click="changeVisibility(item)"
+                    />
+                    <sw-icon
+                            v-else-if="item.isEnabled === 0"
+                            name="small-default-x-line-medium"
+                            small
+                            class="is--inactive"
+                            @click="changeVisibility(item)"
+                    />
+                    <sw-icon
+                            v-else
+                            key="inherit-icon"
+                            :multicolor="true"
+                            name="custom-inherited"
+                            size="16"
+                    />
+                </template>
+            </template>
+        {% endblock %}
+
+
+        {% block wbp_product_tabs_actions %}
+            <template slot="actions" slot-scope="{ item }">
+
+                {% block wbp_product_tabs_actions_items %}
+                    <sw-context-menu-item @click="onEdit(item)">
+                        Edit
+                    </sw-context-menu-item>
+
+                    <sw-context-menu-item @click="onDelete(item)">
+                        Delete
+                    </sw-context-menu-item>
+                {% endblock %}
+
+            </template>
+        {% endblock %}
+
+    </sw-data-grid>
+
+    {% block wbp_product_tabs_modal_generation %}
+        <wbp-product-tabs-modal-generation
+                v-if="activeModal === 'addNewTab'"
+                :productId="product.id"
+                @close-modal="activeModal = ''"
+                @product-tabs-save="productTabsSave"
+        />
+    {% endblock %}
+
+</sw-card>

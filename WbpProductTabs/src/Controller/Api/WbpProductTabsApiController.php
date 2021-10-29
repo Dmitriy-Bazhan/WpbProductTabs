@@ -1,10 +1,11 @@
 <?php
-namespace WbpProductTabs\Controller\Api;
 
+namespace WbpProductTabs\Controller\Api;
 
 
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -39,7 +40,7 @@ class WbpProductTabsApiController extends AbstractController
     {
         $params = $request->request->all();
 
-        if(!isset($params['productId']) ) {
+        if (!isset($params['productId'])) {
             return new JsonResponse([
                 'state' => 'failed',
                 'error' => 'Configuration invalid'
@@ -76,6 +77,51 @@ class WbpProductTabsApiController extends AbstractController
 
         return new JsonResponse([
             'success' => 'Default tabs created'
+        ]);
+    }
+
+
+    /**
+     * @Route("/api/wbp-product-tabs/change-visibility", name="api.action.wbpproducttabs.changevisibility", methods={"POST"})
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function changeVisibility(Request $request, Context $context): JsonResponse
+    {
+        $params = $request->request->all();
+
+        if (!isset($params['tabsId'])) {
+            return new JsonResponse([
+                'state' => 'failed',
+                'error' => 'Configuration invalid'
+            ]);
+        }
+
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('id', $params['tabsId']));
+        $tabsId = $this->productTabsRepository->searchIds($criteria, $context)->firstId();
+        $tab = $this->productTabsRepository->search($criteria, $context)->first();
+
+        if ($tab->isEnabled == 0) {
+            $this->productTabsRepository->update([
+                [
+                    'id' => $tabsId,
+                    'isEnabled' => 1
+                ]
+            ], $context);
+        } else {
+            $this->productTabsRepository->update([
+                [
+                    'id' => $tabsId,
+                    'isEnabled' => 0
+                ]
+            ], $context);
+        }
+
+
+        return new JsonResponse([
+            'success' => 'Visibility changed'
         ]);
     }
 }

@@ -1,4 +1,5 @@
 import template from './sw-product-detail-tabs.html.twig';
+import './sw-product-detail-tabs.scss';
 
 const {Component, Mixin, Context} = Shopware;
 const {Criteria} = Shopware.Data;
@@ -25,16 +26,16 @@ Component.register('sw-product-detail-tabs', {
                 {
                     property: 'id',
                     label: 'Id',
-                    allowResize: true,
+                    // allowResize: true,
                     width: '125px',
-                    align: 'right',
+                    align: 'left',
                 },
                 {
                     property: 'tabsName',
                     label: 'Tab Name',
                     inlineEdit: 'string',
                     allowResize: true,
-                    width: '125px',
+                    width: '200px',
                     align: 'right',
                 },
                 {
@@ -42,7 +43,7 @@ Component.register('sw-product-detail-tabs', {
                     label: 'Data',
                     inlineEdit: 'string',
                     allowResize: true,
-                    width: '125px',
+                    width: '400px',
                     align: 'right',
                 },
                 {
@@ -52,10 +53,10 @@ Component.register('sw-product-detail-tabs', {
                     allowResize: true,
                     width: '125px',
                     align: 'right',
-                }
+                },
             ],
             repository: null,
-            productId: null
+            activeModal: ''
         };
     },
 
@@ -66,15 +67,6 @@ Component.register('sw-product-detail-tabs', {
     computed: {
         ...mapState('swProductDetail', [
             'product',
-            'parentProduct',
-            'customFieldSets',
-            'loading',
-        ]),
-
-        ...mapGetters('swProductDetail', [
-            'isLoading',
-            'showModeSetting',
-            'showProductCard',
         ]),
 
         productMediaRepository() {
@@ -87,9 +79,11 @@ Component.register('sw-product-detail-tabs', {
 
         itemsCriteria() {
             //Todo: temporary
-            let path = window.location.href;
-            let arr = path.split('/');
-            this.productId = arr[7];
+            if (this.product.id === undefined) {
+                let path = window.location.href;
+                let arr = path.split('/');
+                this.product.id = arr[7];
+            }
 
             const criteria = new Criteria();
             const params = this.getMainListingParams();
@@ -98,7 +92,7 @@ Component.register('sw-product-detail-tabs', {
 
             criteria.setTerm(this.term);
             criteria.addSorting(Criteria.sort(params.sortBy, params.sortDirection));
-            criteria.addFilter(Criteria.equals('productId', this.productId));
+            criteria.addFilter(Criteria.equals('productId', this.product.id));
 
             return criteria;
         }
@@ -113,6 +107,13 @@ Component.register('sw-product-detail-tabs', {
                 this.dataSource = items;
             });
         },
+        addNewTab(){
+            this.activeModal = 'addNewTab';
+        },
+        productTabsSave(){
+            this.activeModal = '';
+            this.getList();
+        },
 
         onEdit(item) {
             console.log(item.id);
@@ -122,10 +123,20 @@ Component.register('sw-product-detail-tabs', {
             console.log(item.id);
         },
 
-        setDefaultTabs() {
-            this.wbpProductTabs.setDefaultTabs(this.productId)
+        changeVisibility(item) {
+            this.wbpProductTabs.changeVisibility(item.id)
                 .then((result) => {
-                    window.location.reload();
+                    this.getList();
+                })
+                .catch((error) => {
+                    this.handleError(error);
+                });
+        },
+
+        setDefaultTabs() {
+            this.wbpProductTabs.setDefaultTabs(this.product.id)
+                .then((result) => {
+                    this.getList();
                 })
                 .catch((error) => {
                     this.handleError(error);

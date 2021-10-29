@@ -1,0 +1,46 @@
+{% block wbp_product_tabs_modal_generation %}
+    <sw-modal
+            class="wbp-product-tabs-modal-generation"
+            @modal-close="$emit('close-modal')"
+    >
+
+        {% block wbp_product_tabs_modal_generation_sidebar %}
+            <div>
+
+                <sw-text-field
+                        required
+                        class="wbp-product-tabs-base__active"
+                        v-model="tabs.tabsName"
+                        validation="required"
+                        label="Name"
+                        :error="tabsTabsNameError">
+                </sw-text-field>
+
+            </div>
+
+            <div>
+
+                <sw-text-field
+                        class="wbp-product-tabs-base__active"
+                        v-model="tabs.data"
+                        validation="required"
+                        label="Data"
+                        :error="tabsDataError">
+
+                </sw-text-field>
+
+            </div>
+
+            <div>
+                <sw-button
+                        @click="saveTabs()"
+                >
+                    Save
+                </sw-button>
+            </div>
+
+        {% endblock %}
+
+    </sw-modal>
+
+{% endblock %}
