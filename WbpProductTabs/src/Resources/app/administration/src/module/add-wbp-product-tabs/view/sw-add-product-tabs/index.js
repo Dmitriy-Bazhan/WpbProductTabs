@@ -1,15 +1,29 @@
-import template from './sw-product-tabs-modal-generation.html.twig';
+import template from "./sw-product-detail-add-tabs.html.twig";
 
 const {Component, Mixin, Context} = Shopware;
 const {Criteria} = Shopware.Data;
 const {mapState, mapGetters, mapPropertyErrors} = Component.getComponentHelper();
 
-Component.register('wbp-product-tabs-modal-generation', {
+Component.register('sw-product-detail-add-tabs', {
     template,
+
+    metaInfo() {
+        return {
+            title: 'Add Tabs'
+        };
+    },
+
+    mixins: [
+        Mixin.getByName('placeholder')
+    ],
 
     data: function () {
         return {
             tabs: {
+                tabsName: null,
+                data: null
+            },
+            error: {
                 tabsName: null,
                 data: null
             }
@@ -17,12 +31,17 @@ Component.register('wbp-product-tabs-modal-generation', {
     },
 
     inject: [
-        'WbpProductTabsService'
+        'WbpAddProductTabsService'
     ],
 
     computed: {
         ...mapState('swProductDetail', [
             'product',
+        ]),
+
+        ...mapPropertyErrors('tabs', [
+            'tabsName',
+            'data'
         ])
     },
 
@@ -51,16 +70,16 @@ Component.register('wbp-product-tabs-modal-generation', {
             }
 
             if (this.tabs.tabsName !== null && this.tabs.data !== null) {
-                this.WbpProductTabsService.setNewData(this.tabs)
+                this.WbpAddProductTabsService.setNewData(this.tabs)
                     .then((result) => {
                         console.log(result);
-                        this.$emit('product-tabs-save');
                     })
                     .catch((error) => {
                         this.handleError(error);
                     });
             }
+
+            console.log(this.error);
         }
     }
-
 });

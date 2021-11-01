@@ -13,7 +13,6 @@
 
                     {% block wbp_product_tabs_list_toolbar_buttons %}
                         <sw-button
-                                v-tooltip=""
                                 @click="addNewTab()"
                         >
                             Add New Tabs
@@ -67,25 +66,69 @@
         {% endblock %}
 
 
-        {% block wbp_product_tabs_actions %}
-            <template slot="actions" slot-scope="{ item }">
+        {% if(item.tabsName != 'Reviews' and item.tabsName != 'Description') %}
+        <template #actions="{ item }">
 
-                {% block wbp_product_tabs_actions_items %}
-                    <sw-context-menu-item @click="onEdit(item)">
-                        Edit
-                    </sw-context-menu-item>
+            {% block sw_integration_list_grid_inner_slot_columns_actions_edit %}
+                <sw-context-menu-item @click="onEdit(item)">
+                    Edit
+                </sw-context-menu-item>
 
-                    <sw-context-menu-item @click="onDelete(item)">
-                        Delete
-                    </sw-context-menu-item>
-                {% endblock %}
+            {% endblock %}
 
-            </template>
-        {% endblock %}
+            {% block sw_integration_list_grid_inner_slot_columns_actions_delete %}
+                <sw-context-menu-item
+                        class="-download-center-file__delete-action"
+                        variant="danger"
+                        @click="showDeleteModal = item.id"
+                >
+
+                    Delete
+                </sw-context-menu-item>
+            {% endblock %}
+
+        </template>
+
+        {% endif %}
+
+        <template #action-modals="{ item }">
+            {% block sw_integration_list_grid_inner_slot_delete_modal %}
+                <sw-modal
+                        variant="small"
+                        v-if="showDeleteModal === item.id"
+                        @modal-close="onCloseDeleteModal"
+                >
+                    {% block sw_integration_list_grid_inner_slot_delete_modal_confirmtext %}
+                        <p>
+                            DELETE TAB
+                        </p>
+                    {% endblock %}
+
+                    {% block sw_integration_list_grid_inner_slot_delete_modal_footer %}
+                        <template slot="modal-footer">
+                            <sw-button
+                                    size="small"
+                                    @click="onCloseDeleteModal"
+                            >
+                                Cancel
+                            </sw-button>
+
+                            <sw-button
+                                    size="small"
+                                    variant="danger"
+                                    @click="onConfirmDelete(item)"
+                            >
+                                Delete
+                            </sw-button>
+                        </template>
+                    {% endblock %}
+                </sw-modal>
+            {% endblock %}
+        </template>
 
     </sw-data-grid>
 
-    {% block wbp_product_tabs_modal_generation %}
+    {% block sw_product_tabs_modal_generation %}
         <wbp-product-tabs-modal-generation
                 v-if="activeModal === 'addNewTab'"
                 :productId="product.id"
@@ -93,5 +136,6 @@
                 @product-tabs-save="productTabsSave"
         />
     {% endblock %}
+
 
 </sw-card>

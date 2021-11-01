@@ -3,7 +3,7 @@ import './sw-product-detail-tabs.scss';
 
 const {Component, Mixin, Context} = Shopware;
 const {Criteria} = Shopware.Data;
-const {mapState, mapGetters} = Component.getComponentHelper();
+const {mapState, mapGetters} = Shopware.Component.getComponentHelper();
 
 Component.register('sw-product-detail-tabs', {
     template,
@@ -16,7 +16,7 @@ Component.register('sw-product-detail-tabs', {
 
     inject: [
         'repositoryFactory',
-        'wbpProductTabs'
+        'WbpProductTabsService'
     ],
 
     data: function () {
@@ -26,14 +26,12 @@ Component.register('sw-product-detail-tabs', {
                 {
                     property: 'id',
                     label: 'Id',
-                    // allowResize: true,
                     width: '125px',
                     align: 'left',
                 },
                 {
                     property: 'tabsName',
                     label: 'Tab Name',
-                    inlineEdit: 'string',
                     allowResize: true,
                     width: '200px',
                     align: 'right',
@@ -41,7 +39,6 @@ Component.register('sw-product-detail-tabs', {
                 {
                     property: 'data',
                     label: 'Data',
-                    inlineEdit: 'string',
                     allowResize: true,
                     width: '400px',
                     align: 'right',
@@ -49,14 +46,13 @@ Component.register('sw-product-detail-tabs', {
                 {
                     property: 'isEnabled',
                     label: 'Is Enabled',
-                    inlineEdit: 'boolean',
                     allowResize: true,
                     width: '125px',
                     align: 'right',
                 },
             ],
-            repository: null,
-            activeModal: ''
+            activeModal: '',
+            showDeleteModal: '',
         };
     },
 
@@ -68,10 +64,6 @@ Component.register('sw-product-detail-tabs', {
         ...mapState('swProductDetail', [
             'product',
         ]),
-
-        productMediaRepository() {
-            return this.repositoryFactory.create(this.product.entity);
-        },
 
         wbpProductTabsRepository() {
             return this.repositoryFactory.create('wbp_product_tabs');
@@ -86,12 +78,12 @@ Component.register('sw-product-detail-tabs', {
             }
 
             const criteria = new Criteria();
-            const params = this.getMainListingParams();
-            params.sortBy = params.sortBy || 'id';
-            params.sortDirection = params.sortDirection || 'ASC';
+            // const params = this.getMainListingParams();
+            // params.sortBy = params.sortBy || 'id';
+            // params.sortDirection = params.sortDirection || 'ASC';
 
-            criteria.setTerm(this.term);
-            criteria.addSorting(Criteria.sort(params.sortBy, params.sortDirection));
+            // criteria.setTerm(this.term);
+            // criteria.addSorting(Criteria.sort(params.sortBy, params.sortDirection));
             criteria.addFilter(Criteria.equals('productId', this.product.id));
 
             return criteria;
@@ -100,16 +92,18 @@ Component.register('sw-product-detail-tabs', {
 
     methods: {
         getList() {
-            this.wbpProductTabsRepository.search(this.itemsCriteria, Shopware.Context.api).then(items => {
+            this.wbpProductTabsRepository.search(this.itemsCriteria, Context.api).then(items => {
                 if (items.length < 1) {
                     this.setDefaultTabs();
                 }
                 this.dataSource = items;
             });
         },
+
         addNewTab(){
             this.activeModal = 'addNewTab';
         },
+
         productTabsSave(){
             this.activeModal = '';
             this.getList();
@@ -119,12 +113,26 @@ Component.register('sw-product-detail-tabs', {
             console.log(item.id);
         },
 
-        onDelete(item) {
-            console.log(item.id);
+        onConfirmDelete(item){
+            console.log('onConfirmDelete' + item.id);
+            this.WbpProductTabsService.removeTab(item.id)
+                .then((result) => {
+                    this.showDeleteModal = null;
+                    this.getList();
+                })
+                .catch((error) => {
+                    this.handleError(error);
+                });
+
+
+        },
+
+        onCloseDeleteModal() {
+            this.showDeleteModal = null;
         },
 
         changeVisibility(item) {
-            this.wbpProductTabs.changeVisibility(item.id)
+            this.WbpProductTabsService.changeVisibility(item.id)
                 .then((result) => {
                     this.getList();
                 })
@@ -134,7 +142,7 @@ Component.register('sw-product-detail-tabs', {
         },
 
         setDefaultTabs() {
-            this.wbpProductTabs.setDefaultTabs(this.product.id)
+            this.wbpProductTabsService.setDefaultTabs(this.product.id)
                 .then((result) => {
                     this.getList();
                 })

@@ -21,7 +21,7 @@ Shopware.Module.register('sw-new-tab-tabs', {
     }
 });
 
-Shopware.Application.addServiceProvider('wbpProductTabs', () => {
+Shopware.Application.addServiceProvider('WbpProductTabsService', () => {
     return new WbpProductTabsService(
         Shopware.Application.getContainer('init').httpClient,
         Shopware.Service('loginService')

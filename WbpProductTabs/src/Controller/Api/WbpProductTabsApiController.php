@@ -124,4 +124,69 @@ class WbpProductTabsApiController extends AbstractController
             'success' => 'Visibility changed'
         ]);
     }
+
+    /**
+     * @Route("/api/wbp-product-tabs/set-new-tab", name="api.action.wbpproducttabs.setnewtab", methods={"POST"})
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function setNewTab(Request $request, Context $context): JsonResponse
+    {
+        $params = $request->request->all();
+
+        if(is_null($params['newTab']['tabsName']) || is_null($params['newTab']['data']) || is_null($params['newTab']['productId'])){
+            return new JsonResponse([
+                'state' => 'failed',
+                'error' => 'Configuration invalid'
+            ]);
+        }
+
+        $id = Uuid::randomHex();
+
+        $this->productTabsRepository->create([
+            [
+                'id' => $id,
+                'productId' => $params['newTab']['productId'],
+                'tabsName' => $params['newTab']['tabsName'],
+                'data' => $params['newTab']['data'],
+                'isEnabled' => 1,
+                'createdAt' => date('Y-m-d H:i:s'),
+                'updatedAt' => null,
+            ]
+        ], $context);
+
+
+        return new JsonResponse([
+            'success' => 'Ok'
+        ]);
+    }
+
+    /**
+     * @Route("/api/wbp-product-tabs/remove-tab", name="api.action.wbpproducttabs.removetab", methods={"POST"})
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function removeTab(Request $request, Context $context): JsonResponse
+    {
+        $params = $request->request->all();
+
+        if(is_null($params['id'])){
+            return new JsonResponse([
+                'state' => 'failed',
+                'error' => 'Configuration invalid'
+            ]);
+        }
+
+        $this->productTabsRepository->delete([
+            [
+                'id' => $params['id']
+            ]
+        ], $context);
+
+        return new JsonResponse([
+            'success' => 'Ok'
+        ]);
+    }
 }

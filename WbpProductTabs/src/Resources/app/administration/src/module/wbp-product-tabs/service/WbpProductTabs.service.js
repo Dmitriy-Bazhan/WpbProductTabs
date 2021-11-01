@@ -25,4 +25,22 @@ export default class WbpProductTabsService extends ApiService {
 
         return changeVisibilityResponse;
     }
+
+    async setNewData(tab) {
+
+        let response = await this.httpClient.post('/wbp-product-tabs/set-new-tab', {newTab: tab}, {
+            headers: this.getBasicHeaders()
+        });
+
+        return response;
+    }
+
+    async removeTab(id) {
+
+        let response = await this.httpClient.post('/wbp-product-tabs/remove-tab', {id: id}, {
+            headers: this.getBasicHeaders()
+        });
+
+        return response;
+    }
 }
