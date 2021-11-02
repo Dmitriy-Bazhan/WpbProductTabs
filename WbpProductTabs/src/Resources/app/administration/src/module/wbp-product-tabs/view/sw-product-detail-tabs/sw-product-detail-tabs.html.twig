@@ -1,4 +1,6 @@
-<sw-card title="Tabs" class="wbp_product_tabs_list_toolbar_wrapper">
+<sw-card
+        :title="$tc('wbp-product-tabs.general.title')"
+        class="wbp_product_tabs_list_toolbar_wrapper">
 
     {% block wbp_product_tabs_list_toolbar %}
 
@@ -8,14 +10,14 @@
 
                 <sw-container
                         columns="1fr minmax(50px, 100px) minmax(50px, 1250px)"
-                        gap="0 10px"
-                >
+                        gap="0 10px">
 
                     {% block wbp_product_tabs_list_toolbar_buttons %}
                         <sw-button
+                                class="product-tabs-add-new-tab-button"
                                 @click="addNewTab()"
                         >
-                            Add New Tabs
+                            {{ $tc('wbp-product-tabs.general.add-new-tab') }}
                         </sw-button>
 
                     {% endblock %}
@@ -34,6 +36,32 @@
             :columns="columns"
             :show-selection="false"
     >
+        {% block wbp_product_tabs_position %}
+
+            <template
+                    slot="column-position"
+                    slot-scope="{ item }"
+            >
+                <span>{{ item.position }}</span>
+                <div class="product-tabs-arrow-block">
+                    <span
+                            class="product-tabs-arrow"
+                            v-if="item.position >= 3 && item.position < dataSource.length"
+                            @click="positionUp(item)">
+                       &dArr;
+                    </span>
+                    <span
+                            class="product-tabs-arrow"
+                            v-if="item.position > 3"
+                            @click="positionDown(item)">
+                        &uArr;
+                    </span>
+                </div>
+
+            </template>
+
+        {% endblock %}
+
         {% block wbp_product_tabs_is_enabled %}
             <template
                     slot="column-isEnabled"
@@ -65,31 +93,38 @@
             </template>
         {% endblock %}
 
-
-        {% if(item.tabsName != 'Reviews' and item.tabsName != 'Description') %}
         <template #actions="{ item }">
 
+
             {% block sw_integration_list_grid_inner_slot_columns_actions_edit %}
-                <sw-context-menu-item @click="onEdit(item)">
-                    Edit
+                <sw-context-menu-item @click="onEdit(item)"
+                                      v-if="item.tabsName !== 'Reviews' && item.tabsName !== 'Description'"
+                >
+                    {{ $tc('wbp-product-tabs.general.edit') }}
                 </sw-context-menu-item>
 
             {% endblock %}
 
             {% block sw_integration_list_grid_inner_slot_columns_actions_delete %}
                 <sw-context-menu-item
+                        v-if="item.tabsName !== 'Reviews' && item.tabsName !== 'Description'"
                         class="-download-center-file__delete-action"
                         variant="danger"
                         @click="showDeleteModal = item.id"
                 >
 
-                    Delete
+                    {{ $tc('wbp-product-tabs.general.delete') }}
+                </sw-context-menu-item>
+            {% endblock %}
+
+            {% block sw_integration_list_grid_inner_slot_columns_actions_impossible %}
+                <sw-context-menu-item v-else
+                >
+                    {{ $tc('wbp-product-tabs.general.impossible') }}
                 </sw-context-menu-item>
             {% endblock %}
 
         </template>
-
-        {% endif %}
 
         <template #action-modals="{ item }">
             {% block sw_integration_list_grid_inner_slot_delete_modal %}
@@ -100,7 +135,7 @@
                 >
                     {% block sw_integration_list_grid_inner_slot_delete_modal_confirmtext %}
                         <p>
-                            DELETE TAB
+                            {{ $tc('wbp-product-tabs.general.delete') }}&nbsp;{{ item.tabsName }}
                         </p>
                     {% endblock %}
 
@@ -110,7 +145,7 @@
                                     size="small"
                                     @click="onCloseDeleteModal"
                             >
-                                Cancel
+                                {{ $tc('wbp-product-tabs.general.cancel') }}
                             </sw-button>
 
                             <sw-button
@@ -118,7 +153,7 @@
                                     variant="danger"
                                     @click="onConfirmDelete(item)"
                             >
-                                Delete
+                                {{ $tc('wbp-product-tabs.general.delete') }}
                             </sw-button>
                         </template>
                     {% endblock %}
@@ -132,7 +167,8 @@
         <wbp-product-tabs-modal-generation
                 v-if="activeModal === 'addNewTab'"
                 :productId="product.id"
-                @close-modal="activeModal = ''"
+                :item="editItem"
+                @close-modal="CloseActiveModal()"
                 @product-tabs-save="productTabsSave"
         />
     {% endblock %}

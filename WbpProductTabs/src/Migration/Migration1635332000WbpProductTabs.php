@@ -18,6 +18,7 @@ class Migration1635332000WbpProductTabs extends MigrationStep
             CREATE TABLE IF NOT EXISTS `wbp_product_tabs` (
                 `id` BINARY (16) NOT NULL,
                 `product_id` BINARY (16) NOT NULL,
+                `position` tinyint(1),
                 `tabs_name` VARCHAR(255) COLLATE utf8mb4_unicode_ci NOT NULL,
                 `data` TEXT DEFAULT NULL,
                 `is_enabled` tinyint(1) DEFAULT 1,

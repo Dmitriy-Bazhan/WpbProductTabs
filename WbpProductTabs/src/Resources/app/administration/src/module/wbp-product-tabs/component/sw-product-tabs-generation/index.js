@@ -11,8 +11,18 @@ Component.register('wbp-product-tabs-modal-generation', {
         return {
             tabs: {
                 tabsName: null,
-                data: null
+                data: null,
+                id: null
             }
+        }
+    },
+
+    props: {
+        productId: {
+            type: String
+        },
+        item: {
+            type: Object
         }
     },
 
@@ -23,7 +33,8 @@ Component.register('wbp-product-tabs-modal-generation', {
     computed: {
         ...mapState('swProductDetail', [
             'product',
-        ])
+        ]),
+
     },
 
     created() {
@@ -34,10 +45,49 @@ Component.register('wbp-product-tabs-modal-generation', {
         }
 
         this.tabs.productId = this.product.id;
+        if (this.item !== null) {
+            this.tabs.tabsName = this.item.tabsName;
+            this.tabs.data = this.item.data;
+            this.tabs.id = this.item.id;
+        }else{
+            this.tabs.tabsName = null;
+            this.tabs.data = null;
+            this.tabs.id = null;
+        }
+
     },
 
     methods: {
         saveTabs() {
+            this.validate();
+
+            if (this.tabs.tabsName !== null && this.tabs.data !== null) {
+                this.WbpProductTabsService.setNewTab(this.tabs)
+                    .then((result) => {
+                        this.$emit('product-tabs-save');
+                    })
+                    .catch((error) => {
+                        this.handleError(error);
+                    });
+            }
+        },
+
+        editTab(){
+            this.validate();
+
+            if (this.tabs.tabsName !== null && this.tabs.data !== null) {
+                this.WbpProductTabsService.editTab(this.tabs)
+                    .then((result) => {
+                        this.$emit('product-tabs-save');
+                    })
+                    .catch((error) => {
+                        this.handleError(error);
+                    });
+            }
+
+        },
+
+        validate(){
             if (this.tabs.tabsName === null) {
                 document.getElementById('sw-field--tabs-tabsName').style.border = "solid 1px red";
             } else {
@@ -45,20 +95,9 @@ Component.register('wbp-product-tabs-modal-generation', {
             }
 
             if (this.tabs.data === null) {
-                document.getElementById('sw-field--tabs-data').style.border = "solid 1px red";
+                document.getElementsByClassName('sw-text-editor__content-editor')[0].style.border = "solid 1px red";
             } else {
-                document.getElementById('sw-field--tabs-data').style.border = "solid 1px #d1d9e0";
-            }
-
-            if (this.tabs.tabsName !== null && this.tabs.data !== null) {
-                this.WbpProductTabsService.setNewData(this.tabs)
-                    .then((result) => {
-                        console.log(result);
-                        this.$emit('product-tabs-save');
-                    })
-                    .catch((error) => {
-                        this.handleError(error);
-                    });
+                document.getElementsByClassName('sw-text-editor__content-editor')[0].style.border = "solid 1px #d1d9e0";
             }
         }
     }

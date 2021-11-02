@@ -3,6 +3,7 @@
 namespace WbpProductTabs\Subscriber;
 
 use Psr\Container\ContainerInterface;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\Framework\Struct\ArrayEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\Struct\ArrayStruct;
@@ -44,30 +45,45 @@ class WbpProductTabsSubscriber implements EventSubscriberInterface
         $productId = $event->getPage()->getProduct()->id;
 
 
-        //Todo: это для демо даты. Что бы на продукты с разными размерами тоже расостронялись настройки. Пока не ясно, как будет работать с продукцией клиента
+        //Todo: это для демо даты. Что бы на продукты с разными размерами тоже распростронялись настройки. Пока не ясно, как будет работать с продукцией клиента
         $parentProductId = $event->getPage()->getProduct()->getParentId();
-        if(!is_null($parentProductId)) {
+        if (!is_null($parentProductId)) {
             $productId = $parentProductId;
         }
 
         $criteria = new Criteria();
+        $criteria->addSorting(new FieldSorting('position', FieldSorting::ASCENDING));
         $criteria->addFilter(new EqualsFilter('productId', $productId));
 
         $tabs = $this->productTabsRepository->search($criteria, $context)->getElements();
 
         if (count($tabs) > 0) {
+            $newTab = [];
             foreach ($tabs as $tab) {
                 if ($tab->tabsName == 'Reviews') {
                     $event->getPage()->addExtension('reviews', new ArrayStruct([
                         'visibility' => $tab->isEnabled]));
-                }
-
-                if ($tab->tabsName == 'Description') {
+                } elseif ($tab->tabsName == 'Description') {
                     $event->getPage()->addExtension('description', new ArrayStruct([
                         'visibility' => $tab->isEnabled]));
+                } else {
+                    if ($tab->isEnabled == 1) {
+                        $arr['tabsName'] = $tab->tabsName;
+                        $arr['alias'] = str_replace(' ', '', $tab->tabsName);
+                        $arr['data'] = $tab->data;
+                        $arr['id'] = $tab->id;
+                        $newTab[] = $arr;
+                    }
                 }
+
+
             }
-        }else{
+            if (count($newTab) > 0) {
+                $event->getPage()->addExtension('new_tabs', new ArrayStruct([
+                    'data' => $newTab
+                ]));
+            }
+        } else {
             //default visibility
             $event->getPage()->addExtensions([
                 'reviews' => new ArrayStruct(['visibility' => 1]),

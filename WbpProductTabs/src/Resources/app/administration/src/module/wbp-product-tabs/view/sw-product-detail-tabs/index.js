@@ -24,35 +24,34 @@ Component.register('sw-product-detail-tabs', {
             dataSource: [],
             columns: [
                 {
-                    property: 'id',
-                    label: 'Id',
+                    property: 'position',
+                    label: this.$tc('wbp-product-tabs.general.position'),
                     width: '125px',
                     align: 'left',
                 },
                 {
                     property: 'tabsName',
-                    label: 'Tab Name',
+                    label: this.$tc('wbp-product-tabs.general.tabsName'),
                     allowResize: true,
                     width: '200px',
                     align: 'right',
                 },
                 {
                     property: 'data',
-                    label: 'Data',
-                    allowResize: true,
-                    width: '400px',
-                    align: 'right',
+                    label: this.$tc('wbp-product-tabs.general.data'),
+                    width: '200px',
+                    align: 'left',
                 },
                 {
                     property: 'isEnabled',
-                    label: 'Is Enabled',
-                    allowResize: true,
+                    label: this.$tc('wbp-product-tabs.general.visibility'),
                     width: '125px',
                     align: 'right',
                 },
             ],
             activeModal: '',
             showDeleteModal: '',
+            editItem: null,
         };
     },
 
@@ -78,12 +77,11 @@ Component.register('sw-product-detail-tabs', {
             }
 
             const criteria = new Criteria();
-            // const params = this.getMainListingParams();
-            // params.sortBy = params.sortBy || 'id';
-            // params.sortDirection = params.sortDirection || 'ASC';
+            const params = this.getMainListingParams();
+            params.sortBy = params.sortBy || 'position';
+            params.sortDirection = params.sortDirection || 'ASC';
 
-            // criteria.setTerm(this.term);
-            // criteria.addSorting(Criteria.sort(params.sortBy, params.sortDirection));
+            criteria.addSorting(Criteria.sort(params.sortBy, params.sortDirection));
             criteria.addFilter(Criteria.equals('productId', this.product.id));
 
             return criteria;
@@ -100,21 +98,25 @@ Component.register('sw-product-detail-tabs', {
             });
         },
 
-        addNewTab(){
+        addNewTab() {
             this.activeModal = 'addNewTab';
         },
 
-        productTabsSave(){
+        productTabsSave() {
             this.activeModal = '';
+            this.editItem = null;
             this.getList();
         },
 
         onEdit(item) {
-            console.log(item.id);
+            if (item.tabsName === 'Reviews' || item.tabsName === 'Description') {
+                return;
+            }
+            this.editItem = item;
+            this.activeModal = 'addNewTab';
         },
 
-        onConfirmDelete(item){
-            console.log('onConfirmDelete' + item.id);
+        onConfirmDelete(item) {
             this.WbpProductTabsService.removeTab(item.id)
                 .then((result) => {
                     this.showDeleteModal = null;
@@ -123,12 +125,15 @@ Component.register('sw-product-detail-tabs', {
                 .catch((error) => {
                     this.handleError(error);
                 });
-
-
         },
 
         onCloseDeleteModal() {
             this.showDeleteModal = null;
+        },
+
+        CloseActiveModal(){
+            this.activeModal = '';
+            this.editItem = null;
         },
 
         changeVisibility(item) {
@@ -142,7 +147,27 @@ Component.register('sw-product-detail-tabs', {
         },
 
         setDefaultTabs() {
-            this.wbpProductTabsService.setDefaultTabs(this.product.id)
+            this.WbpProductTabsService.setDefaultTabs(this.product.id)
+                .then((result) => {
+                    this.getList();
+                })
+                .catch((error) => {
+                    this.handleError(error);
+                });
+        },
+
+        positionUp(item){
+            this.WbpProductTabsService.positionUp(item.id, item.productId)
+                .then((result) => {
+                    this.getList();
+                })
+                .catch((error) => {
+                    this.handleError(error);
+                });
+        },
+
+        positionDown(item){
+            this.WbpProductTabsService.positionDown(item.id, item.productId)
                 .then((result) => {
                     this.getList();
                 })

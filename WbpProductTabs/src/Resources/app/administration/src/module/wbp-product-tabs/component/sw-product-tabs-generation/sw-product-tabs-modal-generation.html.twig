@@ -9,27 +9,29 @@
                         required
                         class="wbp-product-tabs-tabsName"
                         v-model="tabs.tabsName"
-                        validation="required"
-                        label="Name"
+                        :label="$tc('wbp-product-tabs.general.tabsName')"
                 >
                 </sw-text-field>
 
             </div>
 
             <div>
-                <sw-text-field
+                <sw-text-editor
                         required
                         class="wbp-product-tabs-data"
-                        v-model="tabs.data"
-                        validation="required"
-                        label="Data"
-                >
-                </sw-text-field>
+                        type="textarea"
+                        :label="$tc('wbp-product-tabs.general.data')"
+                        v-model="tabs.data">
+                </sw-text-editor>
 
             </div>
-            <div>
-                <sw-button @click="saveTabs()">Save</sw-button>
-            </div>
+                <div v-if="tabs.id == null">
+                    <sw-button @click="saveTabs()">{{ $tc('wbp-product-tabs.general.save') }}</sw-button>
+                </div>
+                <div v-else>
+                    <sw-button @click="editTab()">{{ $tc('wbp-product-tabs.general.edit') }}</sw-button>
+                </div>
+
 
         {% endblock %}
 
