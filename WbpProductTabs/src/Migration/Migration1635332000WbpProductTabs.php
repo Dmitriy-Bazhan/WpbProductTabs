@@ -31,6 +31,7 @@ class Migration1635332000WbpProductTabs extends MigrationStep
 
     public function updateDestructive(Connection $connection): void
     {
-        // implement update destructive
+        $sql = "DROP TABLE `wbp_product_tabs`";
+        $connection->executeStatement($sql);
     }
 }
