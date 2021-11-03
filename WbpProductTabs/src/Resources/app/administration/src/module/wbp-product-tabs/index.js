@@ -1,9 +1,5 @@
-import './page/sw-product-tabs';
+import './page/sw-product-detail';
 import './view/sw-product-detail-tabs';
-import './component/sw-product-tabs-generation';
-
-import deDE from './snippet/de-DE.json';
-import enGB from './snippet/en-GB.json';
 
 import WbpProductTabsService from "./service/WbpProductTabs.service";
 
@@ -21,14 +17,10 @@ Shopware.Module.register('sw-new-tab-tabs', {
             });
         }
         next(currentRoute);
-    },
-    snippets: {
-        'de-DE': deDE,
-        'en-GB': enGB
     }
 });
 
-Shopware.Application.addServiceProvider('WbpProductTabsService', () => {
+Shopware.Application.addServiceProvider('wbpProductTabs', () => {
     return new WbpProductTabsService(
         Shopware.Application.getContainer('init').httpClient,
         Shopware.Service('loginService')

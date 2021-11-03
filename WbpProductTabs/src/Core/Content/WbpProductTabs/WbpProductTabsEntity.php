@@ -10,7 +10,6 @@ class WbpProductTabsEntity extends Entity
     use EntityIdTrait;
 
     protected $productId;
-    protected $position;
     protected $isEnabled;
     protected $tabsName;
     protected $data;
@@ -33,16 +32,6 @@ class WbpProductTabsEntity extends Entity
     public function setProductId($productId)
     {
         $this->productId = $productId;
-    }
-
-    public function getPosition()
-    {
-        return $this->position;
-    }
-
-    public function setPosition($position)
-    {
-        $this->position = $position;
     }
 
     public function getTabsName()
