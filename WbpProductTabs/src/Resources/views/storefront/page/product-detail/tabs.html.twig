@@ -48,7 +48,7 @@
                             {% block page_product_detail_tabs_navigation_review %}
                                 {% if config('core.listing.showReview') %}
                                     <li class="nav-item">
-                                        <a class="nav-link {% if (ratingSuccess == 1) or (ratingSuccess == -1) %}active{% endif %} product-detail-tab-navigation-link"
+                                        <a class="nav-link {% if (ratingSuccess == 1) or (ratingSuccess == -1) or (page.extensions.description.visibility == 0) %}active{% endif %} product-detail-tab-navigation-link"
                                            id="review-tab"
                                            data-toggle="tab"
                                            data-offcanvas-tabs="true"
@@ -64,6 +64,31 @@
                                     </li>
                                 {% endif %}
                             {% endblock %}
+
+                        {% endif %}
+
+                        {% if page.extensions.new_tabs|length > 0 %}
+
+                            {% for item in page.extensions.new_tabs.data %}
+
+                                {% block new_tab_item %}
+
+                                    <li class="nav-item">
+                                        <a class="nav-link {% if (ratingSuccess == 1) or (ratingSuccess == -1) %}active{% endif %} product-detail-tab-navigation-link"
+                                           id="{{ item.alias }}-tab"
+                                           data-toggle="tab"
+                                           data-offcanvas-tabs="true"
+                                           href="#{{ item.alias }}-tab-pane"
+                                           role="tab"
+                                           aria-controls="{{ item.alias }}-tab-pane"
+                                           aria-selected="true">
+                                            <span> {{ item.tabsName }}</span>
+                                        </a>
+                                    </li>
+
+                                {% endblock %}
+
+                            {% endfor %}
 
                         {% endif %}
 
@@ -94,7 +119,7 @@
 
                             {% block page_product_detail_tabs_content_review %}
                                 {% if config('core.listing.showReview') %}
-                                    <div class="tab-pane fade show {% if (ratingSuccess == 1) or (ratingSuccess == -1) %}active{% endif %}"
+                                    <div class="tab-pane fade show {% if (ratingSuccess == 1) or (ratingSuccess == -1) or(page.extensions.description.visibility == 0) %}active{% endif %}"
                                          id="review-tab-pane"
                                          role="tabpanel"
                                          aria-labelledby="review-tab">
@@ -104,6 +129,28 @@
                             {% endblock %}
 
                         {% endif %}
+
+                        {% if page.extensions.new_tabs|length > 0 %}
+
+                            {% for index,item in page.extensions.new_tabs.data %}
+
+                                {% block new_tab_item_block %}
+
+                                    <div class="tab-pane fade show {% if ((ratingSuccess == 1) or (ratingSuccess == -1)
+                                        or((page.extensions.description.visibility == 0)
+                                        and(page.extensions.review.visibility == 0)) and (index == 0)) %}active{% endif %}"
+                                         id="{{ item.alias }}-tab-pane"
+                                         role="tabpanel"
+                                         aria-labelledby="{{ item.alias }}-tab">
+                                        {{ item.data|raw }}
+                                    </div>
+
+                                {% endblock %}
+
+                            {% endfor %}
+
+                        {% endif %}
+
 
                     </div>
                 {% endblock %}

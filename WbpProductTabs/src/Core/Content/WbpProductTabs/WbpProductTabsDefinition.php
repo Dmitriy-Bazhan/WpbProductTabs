@@ -40,7 +40,7 @@ class WbpProductTabsDefinition extends EntityDefinition
         return new FieldCollection([
             (new IdField('id', 'id'))->addFlags(new ApiAware(), new PrimaryKey(), new Required()),
             (new IdField('product_id', 'productId'))->addFlags(new ApiAware(), new Required()),
-//            (new FkField('product_id', 'productId', ProductDefinition::class))->addFlags(new ApiAware(), new Required()),
+            (new IntField('position', 'position'))->addFlags(new ApiAware(), new Required()),
             (new StringField('tabs_name', 'tabsName'))->addFlags(new ApiAware(), new Required()),
             (new LongTextField('data', 'data'))->addFlags(new ApiAware(), new AllowHtml()),
             (new IntField('is_enabled', 'isEnabled'))->addFlags(new ApiAware(), new Required()),

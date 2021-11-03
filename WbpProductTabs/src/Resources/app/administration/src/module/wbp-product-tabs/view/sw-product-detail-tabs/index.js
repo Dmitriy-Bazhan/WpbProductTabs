@@ -1,8 +1,9 @@
 import template from './sw-product-detail-tabs.html.twig';
+import './sw-product-detail-tabs.scss';
 
 const {Component, Mixin, Context} = Shopware;
 const {Criteria} = Shopware.Data;
-const {mapState, mapGetters} = Component.getComponentHelper();
+const {mapState, mapGetters} = Shopware.Component.getComponentHelper();
 
 Component.register('sw-product-detail-tabs', {
     template,
@@ -15,7 +16,7 @@ Component.register('sw-product-detail-tabs', {
 
     inject: [
         'repositoryFactory',
-        'wbpProductTabs'
+        'WbpProductTabsService'
     ],
 
     data: function () {
@@ -23,39 +24,34 @@ Component.register('sw-product-detail-tabs', {
             dataSource: [],
             columns: [
                 {
-                    property: 'id',
-                    label: 'Id',
-                    allowResize: true,
+                    property: 'position',
+                    label: this.$tc('wbp-product-tabs.general.position'),
                     width: '125px',
-                    align: 'right',
+                    align: 'left',
                 },
                 {
                     property: 'tabsName',
-                    label: 'Tab Name',
-                    inlineEdit: 'string',
+                    label: this.$tc('wbp-product-tabs.general.tabsName'),
                     allowResize: true,
-                    width: '125px',
+                    width: '200px',
                     align: 'right',
                 },
                 {
                     property: 'data',
-                    label: 'Data',
-                    inlineEdit: 'string',
-                    allowResize: true,
-                    width: '125px',
-                    align: 'right',
+                    label: this.$tc('wbp-product-tabs.general.data'),
+                    width: '200px',
+                    align: 'left',
                 },
                 {
                     property: 'isEnabled',
-                    label: 'Is Enabled',
-                    inlineEdit: 'boolean',
-                    allowResize: true,
+                    label: this.$tc('wbp-product-tabs.general.visibility'),
                     width: '125px',
                     align: 'right',
-                }
+                },
             ],
-            repository: null,
-            productId: null
+            activeModal: '',
+            showDeleteModal: '',
+            editItem: null,
         };
     },
 
@@ -66,20 +62,7 @@ Component.register('sw-product-detail-tabs', {
     computed: {
         ...mapState('swProductDetail', [
             'product',
-            'parentProduct',
-            'customFieldSets',
-            'loading',
         ]),
-
-        ...mapGetters('swProductDetail', [
-            'isLoading',
-            'showModeSetting',
-            'showProductCard',
-        ]),
-
-        productMediaRepository() {
-            return this.repositoryFactory.create(this.product.entity);
-        },
 
         wbpProductTabsRepository() {
             return this.repositoryFactory.create('wbp_product_tabs');
@@ -87,18 +70,19 @@ Component.register('sw-product-detail-tabs', {
 
         itemsCriteria() {
             //Todo: temporary
-            let path = window.location.href;
-            let arr = path.split('/');
-            this.productId = arr[7];
+            if (this.product.id === undefined) {
+                let path = window.location.href;
+                let arr = path.split('/');
+                this.product.id = arr[7];
+            }
 
             const criteria = new Criteria();
             const params = this.getMainListingParams();
-            params.sortBy = params.sortBy || 'id';
+            params.sortBy = params.sortBy || 'position';
             params.sortDirection = params.sortDirection || 'ASC';
 
-            criteria.setTerm(this.term);
             criteria.addSorting(Criteria.sort(params.sortBy, params.sortDirection));
-            criteria.addFilter(Criteria.equals('productId', this.productId));
+            criteria.addFilter(Criteria.equals('productId', this.product.id));
 
             return criteria;
         }
@@ -106,7 +90,7 @@ Component.register('sw-product-detail-tabs', {
 
     methods: {
         getList() {
-            this.wbpProductTabsRepository.search(this.itemsCriteria, Shopware.Context.api).then(items => {
+            this.wbpProductTabsRepository.search(this.itemsCriteria, Context.api).then(items => {
                 if (items.length < 1) {
                     this.setDefaultTabs();
                 }
@@ -114,18 +98,78 @@ Component.register('sw-product-detail-tabs', {
             });
         },
 
-        onEdit(item) {
-            console.log(item.id);
+        addNewTab() {
+            this.activeModal = 'addNewTab';
         },
 
-        onDelete(item) {
-            console.log(item.id);
+        productTabsSave() {
+            this.activeModal = '';
+            this.editItem = null;
+            this.getList();
+        },
+
+        onEdit(item) {
+            if (item.tabsName === 'Reviews' || item.tabsName === 'Description') {
+                return;
+            }
+            this.editItem = item;
+            this.activeModal = 'addNewTab';
+        },
+
+        onConfirmDelete(item) {
+            this.WbpProductTabsService.removeTab(item.id)
+                .then((result) => {
+                    this.showDeleteModal = null;
+                    this.getList();
+                })
+                .catch((error) => {
+                    this.handleError(error);
+                });
+        },
+
+        onCloseDeleteModal() {
+            this.showDeleteModal = null;
+        },
+
+        CloseActiveModal(){
+            this.activeModal = '';
+            this.editItem = null;
+        },
+
+        changeVisibility(item) {
+            this.WbpProductTabsService.changeVisibility(item.id)
+                .then((result) => {
+                    this.getList();
+                })
+                .catch((error) => {
+                    this.handleError(error);
+                });
         },
 
         setDefaultTabs() {
-            this.wbpProductTabs.setDefaultTabs(this.productId)
+            this.WbpProductTabsService.setDefaultTabs(this.product.id)
                 .then((result) => {
-                    window.location.reload();
+                    this.getList();
+                })
+                .catch((error) => {
+                    this.handleError(error);
+                });
+        },
+
+        positionUp(item){
+            this.WbpProductTabsService.positionUp(item.id, item.productId)
+                .then((result) => {
+                    this.getList();
+                })
+                .catch((error) => {
+                    this.handleError(error);
+                });
+        },
+
+        positionDown(item){
+            this.WbpProductTabsService.positionDown(item.id, item.productId)
+                .then((result) => {
+                    this.getList();
                 })
                 .catch((error) => {
                     this.handleError(error);

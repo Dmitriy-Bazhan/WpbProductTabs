@@ -1,0 +1,37 @@
+{% block wbp_product_tabs_modal_generation_sidebar %}
+
+    <sw-card-view class="aaaaa">
+
+        <sw-card>
+            <sw-container columns="repeat(auto-fit, minmax(300px, 1fr))" gap="0px 30px">
+
+                <sw-text-field
+                        required
+                        class="wbp-product-tabs-tabsName"
+                        v-model="tabs.tabsName"
+                        validation="required"
+                        label="Name"
+                        :error="tabsTabsNameError"
+                >
+                </sw-text-field>
+
+
+
+                <sw-text-field
+                        required
+                        class="wbp-product-tabs-data"
+                        v-model="tabs.data"
+                        validation="required"
+                        label="Data"
+                        :error="tabsDataError">
+                </sw-text-field>
+
+
+                <sw-button @click="saveTabs()">Save</sw-button>
+
+            </sw-container>
+        </sw-card>
+
+    </sw-card-view>
+
+{% endblock %}
