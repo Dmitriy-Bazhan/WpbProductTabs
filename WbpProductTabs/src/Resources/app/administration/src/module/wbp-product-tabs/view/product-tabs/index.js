@@ -1,11 +1,11 @@
-import template from './sw-product-detail-tabs.html.twig';
-import './sw-product-detail-tabs.scss';
+import template from './product-detail-tabs.html.twig';
+import './product-detail-tabs.scss';
 
 const {Component, Mixin, Context} = Shopware;
 const {Criteria} = Shopware.Data;
 const {mapState, mapGetters} = Shopware.Component.getComponentHelper();
 
-Component.register('sw-product-detail-tabs', {
+Component.register('product-tabs', {
     template,
 
     metaInfo() {
