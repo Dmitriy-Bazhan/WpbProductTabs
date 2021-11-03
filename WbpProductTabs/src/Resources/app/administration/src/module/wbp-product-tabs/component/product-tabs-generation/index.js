@@ -1,4 +1,4 @@
-import template from './sw-product-tabs-modal-generation.html.twig';
+import template from './product-tabs-modal-generation.html.twig';
 
 const {Component, Mixin, Context} = Shopware;
 const {Criteria} = Shopware.Data;
