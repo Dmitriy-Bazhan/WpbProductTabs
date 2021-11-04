@@ -12,8 +12,6 @@ class WbpProductTabsEntity extends Entity
     protected $productId;
     protected $position;
     protected $isEnabled;
-    protected $tabsName;
-    protected $data;
 
     public function getIsEnabled()
     {
@@ -44,25 +42,4 @@ class WbpProductTabsEntity extends Entity
     {
         $this->position = $position;
     }
-
-    public function getTabsName()
-    {
-        return $this->tabsName;
-    }
-
-    public function setTabsName(string $tabsName)
-    {
-        $this->tabsName = $tabsName;
-    }
-
-    public function getData()
-    {
-        return $this->data;
-    }
-
-    public function setData($data)
-    {
-        return $this->data = $data;
-    }
-
 }

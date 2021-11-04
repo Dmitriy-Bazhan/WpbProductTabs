@@ -5,21 +5,21 @@ namespace WbpProductTabs\Migration;
 use Doctrine\DBAL\Connection;
 use Shopware\Core\Framework\Migration\MigrationStep;
 
-class Migration1635332000WbpProductTabs extends MigrationStep
+class Migration1636020222WbpProductTabsTranslation extends MigrationStep
 {
     public function getCreationTimestamp(): int
     {
-        return 1635332000;
+        return 1636020222;
     }
 
     public function update(Connection $connection): void
     {
         $connection->executeStatement("
-            CREATE TABLE IF NOT EXISTS `wbp_product_tabs` (
-                `id` BINARY (16) NOT NULL,
-                `product_id` BINARY (16) NOT NULL,
-                `position` tinyint(1),
-                `is_enabled` tinyint(1) DEFAULT 1,
+            CREATE TABLE IF NOT EXISTS `wbp_product_tabs_translation` (
+                `product_tab_id` BINARY (16) NOT NULL,
+                `language_id` BINARY (16) NOT NULL,
+                `tabs_name` VARCHAR(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+                `data` TEXT DEFAULT NULL,
                 `created_at` datetime(3) NOT NULL,
                 `updated_at` datetime(3) DEFAULT NULL,
                 PRIMARY KEY ( `id` )
