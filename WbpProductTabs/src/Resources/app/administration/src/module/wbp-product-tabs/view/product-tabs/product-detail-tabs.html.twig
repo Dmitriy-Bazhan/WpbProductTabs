@@ -98,7 +98,7 @@
 
             {% block sw_integration_list_grid_inner_slot_columns_actions_edit %}
                 <sw-context-menu-item @click="onEdit(item)"
-                                      v-if="item.tabsName !== 'Reviews' && item.tabsName !== 'Description'"
+                                      v-if="item.position > 2"
                 >
                     {{ $tc('wbp-product-tabs.general.edit') }}
                 </sw-context-menu-item>
@@ -107,7 +107,7 @@
 
             {% block sw_integration_list_grid_inner_slot_columns_actions_delete %}
                 <sw-context-menu-item
-                        v-if="item.tabsName !== 'Reviews' && item.tabsName !== 'Description'"
+                        v-if="item.position > 2"
                         class="-download-center-file__delete-action"
                         variant="danger"
                         @click="showDeleteModal = item.id"

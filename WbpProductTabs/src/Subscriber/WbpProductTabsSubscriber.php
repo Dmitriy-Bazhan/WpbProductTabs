@@ -60,17 +60,17 @@ class WbpProductTabsSubscriber implements EventSubscriberInterface
         if (count($tabs) > 0) {
             $newTab = [];
             foreach ($tabs as $tab) {
-                if ($tab->tabsName == 'Reviews') {
+                if ($tab->position == 2) {
                     $event->getPage()->addExtension('reviews', new ArrayStruct([
                         'visibility' => $tab->isEnabled]));
-                } elseif ($tab->tabsName == 'Description') {
+                } elseif ($tab->position == 1) {
                     $event->getPage()->addExtension('description', new ArrayStruct([
                         'visibility' => $tab->isEnabled]));
                 } else {
                     if ($tab->isEnabled == 1) {
-                        $arr['tabsName'] = $tab->tabsName;
-                        $arr['alias'] = str_replace(' ', '', $tab->tabsName);
-                        $arr['data'] = $tab->data;
+                        $arr['name'] = $tab->name;
+                        $arr['alias'] = str_replace(' ', '', $tab->name);
+                        $arr['description'] = $tab->description;
                         $arr['id'] = $tab->id;
                         $newTab[] = $arr;
                     }

@@ -3,6 +3,7 @@
 namespace WbpProductTabs\Controller\Api;
 
 
+use Doctrine\DBAL\Connection;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -16,6 +17,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use WbpProductTabs\Resources\helper\TranslationHelper;
 
 /**
  * @RouteScope(scopes={"api"})
@@ -23,12 +25,28 @@ use Symfony\Component\Routing\Annotation\Route;
 class WbpProductTabsApiController extends AbstractController
 {
     private $productTabsRepository;
+    private $productTabsTranslationRepository;
+
+    /**
+     * @var Connection
+     */
+    private $connection;
+
+    /**
+     * @var TranslationHelper
+     */
+    private $translationHelper;
 
     public function __construct(
-        EntityRepositoryInterface $productTabsRepository
+        EntityRepositoryInterface $productTabsRepository,
+        EntityRepositoryInterface $productTabsTranslationRepository,
+        Connection $connection
     )
     {
+        $this->connection = $connection;
         $this->productTabsRepository = $productTabsRepository;
+        $this->productTabsTranslationRepository = $productTabsTranslationRepository;
+        $this->translationHelper = new TranslationHelper($connection);
     }
 
     /**
@@ -39,6 +57,7 @@ class WbpProductTabsApiController extends AbstractController
      */
     public function setDefaultTabs(Request $request, Context $context): JsonResponse
     {
+
         $params = $request->request->all();
 
         if (!isset($params['productId'])) {
@@ -54,8 +73,13 @@ class WbpProductTabsApiController extends AbstractController
                 'id' => $id,
                 'productId' => $params['productId'],
                 'position' => 1,
-                'tabsName' => 'Description',
-                'data' => null,
+                'name' => $this->translationHelper->adjustTranslations([
+                    'de-DE' => 'Description DE',
+                    'en-GB' => 'Description EN']),
+                'description' => $this->translationHelper->adjustTranslations([
+                    'de-DE' => '',
+                    'en-GB' => '',
+                ]),
                 'isEnabled' => 1,
                 'createdAt' => date('Y-m-d H:i:s'),
                 'updatedAt' => null,
@@ -68,16 +92,23 @@ class WbpProductTabsApiController extends AbstractController
                 'id' => $id,
                 'productId' => $params['productId'],
                 'position' => 2,
-                'tabsName' => 'Reviews',
-                'data' => null,
+                'name' => $this->translationHelper->adjustTranslations([
+                    'de-DE' => 'Reviews DE',
+                    'en-GB' => 'Reviews EN'
+                ]),
+                'description' => $this->translationHelper->adjustTranslations([
+                    'de-DE' => '',
+                    'en-GB' => '',
+                ]),
                 'isEnabled' => 1,
                 'createdAt' => date('Y-m-d H:i:s'),
                 'updatedAt' => null,
             ]
         ], $context);
 
+
         return new JsonResponse([
-            'success' => 'Default tabs created'
+            'success' => 'ok'
         ]);
     }
 
@@ -156,8 +187,14 @@ class WbpProductTabsApiController extends AbstractController
                 'id' => $id,
                 'productId' => $params['newTab']['productId'],
                 'position' => ++$element->position,
-                'tabsName' => $params['newTab']['tabsName'],
-                'data' => $params['newTab']['data'],
+                'name' => $this->translationHelper->adjustTranslations([
+                    'de-DE' => $params['newTab']['tabsName'] . ' DE',
+                    'en-GB' => $params['newTab']['tabsName'] . ' EN'
+                ]),
+                'description' => $this->translationHelper->adjustTranslations([
+                    'de-DE' => $params['newTab']['data'] . ' DE',
+                    'en-GB' => $params['newTab']['data'] . ' EN',
+                ]),
                 'isEnabled' => 1,
                 'createdAt' => date('Y-m-d H:i:s'),
                 'updatedAt' => null,
@@ -227,6 +264,7 @@ class WbpProductTabsApiController extends AbstractController
      */
     public function editTab(Request $request, Context $context): JsonResponse
     {
+
         $params = $request->request->all();
 
         if (!isset($params['tab']['id'])) {
@@ -236,21 +274,20 @@ class WbpProductTabsApiController extends AbstractController
             ]);
         }
 
-        $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('id', $params['tab']['id']));
-        $tabsId = $this->productTabsRepository->searchIds($criteria, $context)->firstId();
-
         $this->productTabsRepository->update([
             [
-                'id' => $tabsId,
-                'tabsName' => $params['tab']['tabsName'],
-                'data' => $params['tab']['data']
+                'id' => $params['tab']['id'],
+                'name' => $this->translationHelper->adjustTranslations([
+                    $params['tab']['locale'] => $params['tab']['tabsName']
+                ]),
+                'description' => $this->translationHelper->adjustTranslations([
+                    $params['tab']['locale'] => $params['tab']['data']
+                ]),
             ]
         ], $context);
 
-
         return new JsonResponse([
-            'success' => 'Visibility changed'
+            'success' => $params
         ]);
     }
 

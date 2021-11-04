@@ -1,5 +1,5 @@
 <?php
-namespace WbpProductTabs\Core\Content\WbpProductTabsTranslation;
+namespace WbpProductTabs\Core\Content\WbpProductTabs\Aggregate\WbpProductTabsTranslation;
 
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 

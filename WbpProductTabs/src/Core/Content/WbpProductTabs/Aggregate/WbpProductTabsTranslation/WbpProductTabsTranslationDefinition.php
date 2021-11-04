@@ -1,7 +1,8 @@
 <?php
-namespace WbpProductTabs\Core\Content\WbpProductTabsTranslation;
+namespace WbpProductTabs\Core\Content\WbpProductTabs\Aggregate\WbpProductTabsTranslation;
 
 use Shopware\Core\Content\Product\ProductDefinition;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityTranslationDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\CreatedAtField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\FkField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\ApiAware;
@@ -16,9 +17,10 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\ManyToOneAssociationField
 use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\UpdatedAtField;
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
+use WbpProductTabs\Core\Content\WbpProductTabs\WbpProductTabsDefinition;
 use WbpProductTabs\Core\Content\WbpProductTabs\WbpProductTabsEntity;
 
-class WbpProductTabsTranslationDefinition extends EntityDefinition
+class WbpProductTabsTranslationDefinition extends EntityTranslationDefinition
 {
     public const ENTITY_NAME = 'wbp_product_tabs_translation';
 
@@ -32,6 +34,11 @@ class WbpProductTabsTranslationDefinition extends EntityDefinition
         return WbpProductTabsTranslationCollection::class;
     }
 
+    public function getParentDefinitionClass(): string
+    {
+        return WbpProductTabsDefinition::class;
+    }
+
     public function getEntityClass(): string
     {
         return WbpProductTabsTranslationEntity::class;
@@ -40,14 +47,9 @@ class WbpProductTabsTranslationDefinition extends EntityDefinition
     protected function defineFields(): FieldCollection
     {
         return new FieldCollection([
-            (new IdField('product_tab_id', 'productTabId'))->addFlags(new ApiAware(), new Required()),
-            (new IdField('language_id', 'languageId'))->addFlags(new ApiAware(), new Required()),
-            (new StringField('tabs_name', 'tabsName'))->addFlags(new ApiAware(), new Required()),
-            (new LongTextField('data', 'data'))->addFlags(new ApiAware(), new AllowHtml()),
-            (new CreatedAtField()),
-            (new UpdatedAtField()),
+            (new StringField('name', 'name'))->addFlags(new ApiAware(), new Required()),
+            (new LongTextField('description', 'description'))->addFlags(new ApiAware(), new AllowHtml()),
 
-            new ManyToOneAssociationField('productTab', 'product_tab_id', WbpProductTabsEntity::class, 'id'),
         ]);
     }
 }

@@ -46,8 +46,8 @@ Component.register('wbp-product-tabs-modal-generation', {
 
         this.tabs.productId = this.product.id;
         if (this.item !== null) {
-            this.tabs.tabsName = this.item.tabsName;
-            this.tabs.data = this.item.data;
+            this.tabs.tabsName = this.item.name;
+            this.tabs.data = this.item.description;
             this.tabs.id = this.item.id;
         }else{
             this.tabs.tabsName = null;
@@ -74,10 +74,14 @@ Component.register('wbp-product-tabs-modal-generation', {
 
         editTab(){
             this.validate();
-
+            console.log(window.localStorage['sw-admin-current-language']);
+            console.log(window.localStorage['sw-admin-locale']);
+            this.tabs.langId = window.localStorage['sw-admin-current-language'];
+            this.tabs.locale = window.localStorage['sw-admin-locale'];
             if (this.tabs.tabsName !== null && this.tabs.data !== null) {
                 this.WbpProductTabsService.editTab(this.tabs)
                     .then((result) => {
+                        console.log(result);
                         this.$emit('product-tabs-save');
                     })
                     .catch((error) => {

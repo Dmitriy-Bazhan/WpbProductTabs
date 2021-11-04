@@ -30,14 +30,14 @@ Component.register('product-tabs', {
                     align: 'left',
                 },
                 {
-                    property: 'tabsName',
+                    property: 'name',
                     label: this.$tc('wbp-product-tabs.general.tabsName'),
                     allowResize: true,
                     width: '200px',
                     align: 'right',
                 },
                 {
-                    property: 'data',
+                    property: 'description',
                     label: this.$tc('wbp-product-tabs.general.data'),
                     width: '200px',
                     align: 'left',
@@ -109,7 +109,7 @@ Component.register('product-tabs', {
         },
 
         onEdit(item) {
-            if (item.tabsName === 'Reviews' || item.tabsName === 'Description') {
+            if (item.position <= 2) {
                 return;
             }
             this.editItem = item;

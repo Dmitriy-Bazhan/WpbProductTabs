@@ -14,9 +14,11 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\AllowHtml;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\LongTextField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\OneToManyAssociationField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\TranslatedField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\TranslationsAssociationField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\UpdatedAtField;
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
-use WbpProductTabs\Core\Content\WbpProductTabsTranslation\WbpProductTabsTranslationEntity;
+use WbpProductTabs\Core\Content\WbpProductTabs\Aggregate\WbpProductTabsTranslation\WbpProductTabsTranslationDefinition;
 
 class WbpProductTabsDefinition extends EntityDefinition
 {
@@ -44,10 +46,16 @@ class WbpProductTabsDefinition extends EntityDefinition
             (new IdField('product_id', 'productId'))->addFlags(new ApiAware(), new Required()),
             (new IntField('position', 'position'))->addFlags(new ApiAware(), new Required()),
             (new IntField('is_enabled', 'isEnabled'))->addFlags(new ApiAware(), new Required()),
+            (new TranslatedField('name'))->addFlags(new ApiAware(), new Required()),
+            (new TranslatedField('description'))->addFlags(new ApiAware(), new Required()),
+            (new TranslationsAssociationField(
+                WbpProductTabsTranslationDefinition::class,
+                'wbp_product_tabs_id'
+            ))->addFlags(new ApiAware(), new Required()),
             (new CreatedAtField()),
             (new UpdatedAtField()),
-
-            new OneToManyAssociationField('productTabsTranslations', WbpProductTabsTranslationEntity::class, 'product_tab_id')
         ]);
+
+
     }
 }
