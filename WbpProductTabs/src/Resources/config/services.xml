@@ -24,8 +24,8 @@
 
         <!-- Controllers -->
         <service id="WbpProductTabs\Controller\Api\WbpProductTabsApiController" public="true">
+            <argument type="service" id="service_container"/>
             <argument type="service" id="wbp_product_tabs.repository"/>
-            <argument type="service" id="wbp_product_tabs_translation.repository"/>
             <argument type="service" id="Doctrine\DBAL\Connection"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
@@ -36,6 +36,7 @@
             <argument type="service" id="wbp_product_tabs.repository"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
+
             </call>
         </service>
 

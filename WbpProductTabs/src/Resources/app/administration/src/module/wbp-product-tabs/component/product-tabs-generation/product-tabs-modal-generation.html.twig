@@ -8,8 +8,10 @@
                 <sw-text-field
                         required
                         class="wbp-product-tabs-tabsName"
-                        v-model="tabs.tabsName"
+                        validation="required"
+                        v-model="tabs.name"
                         :label="$tc('wbp-product-tabs.general.tabsName')"
+                        :error="tabsNameError"
                 >
                 </sw-text-field>
 
@@ -19,17 +21,20 @@
                 <sw-text-editor
                         required
                         class="wbp-product-tabs-data"
+                        validation="required"
                         type="textarea"
+                        v-model="tabs.description"
                         :label="$tc('wbp-product-tabs.general.data')"
-                        v-model="tabs.data">
+                        :error="tabsDescriptionError"
+                        >
                 </sw-text-editor>
 
             </div>
-                <div v-if="tabs.id == null">
-                    <sw-button @click="saveTabs()">{{ $tc('wbp-product-tabs.general.save') }}</sw-button>
+                <div v-if="item === null">
+                    <sw-button @click="saveNewTab()">{{ $tc('wbp-product-tabs.general.save') }}</sw-button>
                 </div>
                 <div v-else>
-                    <sw-button @click="editTab()">{{ $tc('wbp-product-tabs.general.edit') }}</sw-button>
+                    <sw-button @click="saveTabs()">{{ $tc('wbp-product-tabs.general.edit') }}</sw-button>
                 </div>
 
 

@@ -49,7 +49,6 @@ class WbpProductTabsTranslationDefinition extends EntityTranslationDefinition
         return new FieldCollection([
             (new StringField('name', 'name'))->addFlags(new ApiAware(), new Required()),
             (new LongTextField('description', 'description'))->addFlags(new ApiAware(), new AllowHtml()),
-
         ]);
     }
 }
