@@ -69,7 +69,7 @@ class WbpProductTabsSubscriber implements EventSubscriberInterface
                 } else {
                     if ($tab->isEnabled == 1) {
                         $arr['name'] = $tab->name;
-                        $arr['alias'] = str_replace(' ', '', $tab->name);
+                        $arr['alias'] = 'id' . str_replace(' ', '', $tab->name);
                         $arr['description'] = $tab->description;
                         $arr['id'] = $tab->id;
                         $newTab[] = $arr;
