@@ -35,15 +35,6 @@ export default class WbpProductTabsService extends ApiService {
         return response;
     }
 
-    async editTab(tab) {
-
-        let response = await this.httpClient.post('/wbp-product-tabs/edit-tab', {tab: tab}, {
-            headers: this.getBasicHeaders()
-        });
-
-        return response;
-    }
-
 
     async removeTab(id) {
 

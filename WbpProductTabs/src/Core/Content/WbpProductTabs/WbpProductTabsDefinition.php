@@ -12,9 +12,13 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\PrimaryKey;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\Required;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\AllowHtml;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\LongTextField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\OneToManyAssociationField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\TranslatedField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\TranslationsAssociationField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\UpdatedAtField;
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
+use WbpProductTabs\Core\Content\WbpProductTabs\Aggregate\WbpProductTabsTranslation\WbpProductTabsTranslationDefinition;
 
 class WbpProductTabsDefinition extends EntityDefinition
 {
@@ -41,11 +45,17 @@ class WbpProductTabsDefinition extends EntityDefinition
             (new IdField('id', 'id'))->addFlags(new ApiAware(), new PrimaryKey(), new Required()),
             (new IdField('product_id', 'productId'))->addFlags(new ApiAware(), new Required()),
             (new IntField('position', 'position'))->addFlags(new ApiAware(), new Required()),
-            (new StringField('tabs_name', 'tabsName'))->addFlags(new ApiAware(), new Required()),
-            (new LongTextField('data', 'data'))->addFlags(new ApiAware(), new AllowHtml()),
             (new IntField('is_enabled', 'isEnabled'))->addFlags(new ApiAware(), new Required()),
+            (new TranslatedField('name'))->addFlags(new ApiAware(), new Required()),
+            (new TranslatedField('description'))->addFlags(new ApiAware(), new Required()),
+            (new TranslationsAssociationField(
+                WbpProductTabsTranslationDefinition::class,
+                'wbp_product_tabs_id'
+            ))->addFlags(new ApiAware(), new Required()),
             (new CreatedAtField()),
             (new UpdatedAtField()),
         ]);
+
+
     }
 }

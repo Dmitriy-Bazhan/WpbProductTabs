@@ -1,7 +1,7 @@
 import template from './product-tabs-modal-generation.html.twig';
 
 const {Component, Mixin, Context} = Shopware;
-const {Criteria} = Shopware.Data;
+const {EntityCollection, Criteria} = Shopware.Data;
 const {mapState, mapGetters, mapPropertyErrors} = Component.getComponentHelper();
 
 Component.register('wbp-product-tabs-modal-generation', {
@@ -10,9 +10,8 @@ Component.register('wbp-product-tabs-modal-generation', {
     data: function () {
         return {
             tabs: {
-                tabsName: null,
-                data: null,
-                id: null
+                name : undefined,
+                description: undefined
             }
         }
     },
@@ -27,41 +26,60 @@ Component.register('wbp-product-tabs-modal-generation', {
     },
 
     inject: [
+        'repositoryFactory',
         'WbpProductTabsService'
     ],
 
     computed: {
-        ...mapState('swProductDetail', [
-            'product',
+
+        ...mapPropertyErrors('tabs', [
+            'name',
+            'description'
         ]),
 
+        wbpProductTabsRepository() {
+            return this.repositoryFactory.create('wbp_product_tabs');
+        }
     },
 
     created() {
-        if (this.product.id === undefined) {
-            let path = window.location.href;
-            let arr = path.split('/');
-            this.product.id = arr[7];
-        }
-
-        this.tabs.productId = this.product.id;
-        if (this.item !== null) {
-            this.tabs.tabsName = this.item.tabsName;
-            this.tabs.data = this.item.data;
-            this.tabs.id = this.item.id;
-        }else{
-            this.tabs.tabsName = null;
-            this.tabs.data = null;
-            this.tabs.id = null;
-        }
-
+        this.editTab();
     },
 
     methods: {
+        editTab() {
+            if (this.item !== null) {
+                this.tabs = new EntityCollection(
+                    this.wbpProductTabsRepository,
+                    Context.api,
+                );
+                this.wbpProductTabsRepository.get(this.item.id, Context.api).then((tabs) => {
+                    this.tabs = tabs;
+                }).catch((error) => {
+                    console.log(error)
+                });
+            }
+        },
+
+
         saveTabs() {
             this.validate();
+            if (this.tabs.name !== undefined && this.tabs.description !== undefined) {
+                this.wbpProductTabsRepository.save(this.tabs, Context.api).then((response) => {
+                    this.$emit('product-tabs-save');
+                }).catch((error) => {
+                    console.log(error);
+                });
+            }
+        },
 
-            if (this.tabs.tabsName !== null && this.tabs.data !== null) {
+        saveNewTab(){
+            this.validate();
+
+            if (this.tabs.name !== undefined && this.tabs.description !== undefined) {
+                let path = window.location.href;
+                let arr = path.split('/');
+                this.tabs.productId = arr[7];
                 this.WbpProductTabsService.setNewTab(this.tabs)
                     .then((result) => {
                         this.$emit('product-tabs-save');
@@ -72,29 +90,14 @@ Component.register('wbp-product-tabs-modal-generation', {
             }
         },
 
-        editTab(){
-            this.validate();
-
-            if (this.tabs.tabsName !== null && this.tabs.data !== null) {
-                this.WbpProductTabsService.editTab(this.tabs)
-                    .then((result) => {
-                        this.$emit('product-tabs-save');
-                    })
-                    .catch((error) => {
-                        this.handleError(error);
-                    });
-            }
-
-        },
-
         validate(){
-            if (this.tabs.tabsName === null) {
-                document.getElementById('sw-field--tabs-tabsName').style.border = "solid 1px red";
+            if (this.tabs.name === undefined) {
+                document.getElementById('sw-field--tabs-name').style.border = "solid 1px red";
             } else {
-                document.getElementById('sw-field--tabs-tabsName').style.border = "solid 1px #d1d9e0";
+                document.getElementById('sw-field--tabs-name').style.border = "solid 1px #d1d9e0";
             }
 
-            if (this.tabs.data === null) {
+            if (this.tabs.description === undefined) {
                 document.getElementsByClassName('sw-text-editor__content-editor')[0].style.border = "solid 1px red";
             } else {
                 document.getElementsByClassName('sw-text-editor__content-editor')[0].style.border = "solid 1px #d1d9e0";

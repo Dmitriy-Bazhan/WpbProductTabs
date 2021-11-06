@@ -19,8 +19,6 @@ class Migration1635332000WbpProductTabs extends MigrationStep
                 `id` BINARY (16) NOT NULL,
                 `product_id` BINARY (16) NOT NULL,
                 `position` tinyint(1),
-                `tabs_name` VARCHAR(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-                `data` TEXT DEFAULT NULL,
                 `is_enabled` tinyint(1) DEFAULT 1,
                 `created_at` datetime(3) NOT NULL,
                 `updated_at` datetime(3) DEFAULT NULL,
@@ -31,7 +29,5 @@ class Migration1635332000WbpProductTabs extends MigrationStep
 
     public function updateDestructive(Connection $connection): void
     {
-        $sql = "DROP TABLE `wbp_product_tabs`";
-        $connection->executeStatement($sql);
     }
 }

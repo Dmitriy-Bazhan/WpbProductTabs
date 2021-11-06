@@ -34,7 +34,7 @@ class WbpProductTabsController extends StorefrontController
     {
         $criteria = new Criteria();
         $productTabs = $this->productTabsRepository->search($criteria, $context)->getElements();
-        dump($productTabs);
+        dump(reset($productTabs));
         die();
     }
 

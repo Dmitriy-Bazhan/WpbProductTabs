@@ -82,7 +82,7 @@
                                            role="tab"
                                            aria-controls="{{ item.alias }}-tab-pane"
                                            aria-selected="true">
-                                            <span> {{ item.tabsName }}</span>
+                                            <span> {{ item.name }}</span>
                                         </a>
                                     </li>
 
@@ -142,7 +142,7 @@
                                          id="{{ item.alias }}-tab-pane"
                                          role="tabpanel"
                                          aria-labelledby="{{ item.alias }}-tab">
-                                        {{ item.data|raw }}
+                                        {{ item.description|raw }}
                                     </div>
 
                                 {% endblock %}

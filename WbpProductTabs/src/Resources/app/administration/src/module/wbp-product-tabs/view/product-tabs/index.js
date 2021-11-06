@@ -30,14 +30,14 @@ Component.register('product-tabs', {
                     align: 'left',
                 },
                 {
-                    property: 'tabsName',
+                    property: 'name',
                     label: this.$tc('wbp-product-tabs.general.tabsName'),
                     allowResize: true,
                     width: '200px',
                     align: 'right',
                 },
                 {
-                    property: 'data',
+                    property: 'description',
                     label: this.$tc('wbp-product-tabs.general.data'),
                     width: '200px',
                     align: 'left',
@@ -52,6 +52,7 @@ Component.register('product-tabs', {
             activeModal: '',
             showDeleteModal: '',
             editItem: null,
+            languageId : null,
         };
     },
 
@@ -59,10 +60,23 @@ Component.register('product-tabs', {
         Mixin.getByName('listing')
     ],
 
+    watch: {
+        contextLanguageId : {
+            handler() {
+                this.getList();
+            },
+            deep: true,
+        },
+    },
+
     computed: {
         ...mapState('swProductDetail', [
-            'product',
+            'product'
         ]),
+
+        ...mapState('context', {
+            contextLanguageId: state => state.api.languageId,
+        }),
 
         wbpProductTabsRepository() {
             return this.repositoryFactory.create('wbp_product_tabs');
@@ -90,12 +104,19 @@ Component.register('product-tabs', {
 
     methods: {
         getList() {
+            this.languageId = this.contextLanguageId;
             this.wbpProductTabsRepository.search(this.itemsCriteria, Context.api).then(items => {
                 if (items.length < 1) {
                     this.setDefaultTabs();
                 }
                 this.dataSource = items;
             });
+        },
+
+
+        onChangeLanguage() {
+            console.log('FFFFF');
+            this.getList();
         },
 
         addNewTab() {
@@ -109,9 +130,10 @@ Component.register('product-tabs', {
         },
 
         onEdit(item) {
-            if (item.tabsName === 'Reviews' || item.tabsName === 'Description') {
+            if (item.position <= 2) {
                 return;
             }
+            item.languageId = this.languageId;
             this.editItem = item;
             this.activeModal = 'addNewTab';
         },

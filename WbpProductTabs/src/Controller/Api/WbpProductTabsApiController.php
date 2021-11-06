@@ -3,10 +3,15 @@
 namespace WbpProductTabs\Controller\Api;
 
 
+use Doctrine\DBAL\Connection;
+use mysql_xdevapi\Exception;
+use Psr\Container\ContainerInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
+use Shopware\Core\Framework\Routing\ApiRouteScope;
+use Shopware\Core\Framework\Routing\RouteScopeRegistry;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
@@ -16,19 +21,37 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use WbpProductTabs\Resources\helper\TranslationHelper;
+use function React\Promise\resolve;
 
 /**
  * @RouteScope(scopes={"api"})
  */
 class WbpProductTabsApiController extends AbstractController
 {
-    private $productTabsRepository;
+    protected $productTabsRepository;
+    protected $container;
+
+    /**
+     * @var Connection
+     */
+    protected $connection;
+
+    /**
+     * @var TranslationHelper
+     */
+    protected $translationHelper;
 
     public function __construct(
-        EntityRepositoryInterface $productTabsRepository
+        ContainerInterface $container,
+        EntityRepositoryInterface $productTabsRepository,
+        Connection $connection
     )
     {
+        $this->connection = $connection;
         $this->productTabsRepository = $productTabsRepository;
+        $this->translationHelper = new TranslationHelper($connection);
+        $this->container = $container;
     }
 
     /**
@@ -39,6 +62,7 @@ class WbpProductTabsApiController extends AbstractController
      */
     public function setDefaultTabs(Request $request, Context $context): JsonResponse
     {
+
         $params = $request->request->all();
 
         if (!isset($params['productId'])) {
@@ -54,8 +78,13 @@ class WbpProductTabsApiController extends AbstractController
                 'id' => $id,
                 'productId' => $params['productId'],
                 'position' => 1,
-                'tabsName' => 'Description',
-                'data' => null,
+                'name' => $this->translationHelper->adjustTranslations([
+                    'de-DE' => 'Description DE',
+                    'en-GB' => 'Description EN']),
+                'description' => $this->translationHelper->adjustTranslations([
+                    'de-DE' => '',
+                    'en-GB' => '',
+                ]),
                 'isEnabled' => 1,
                 'createdAt' => date('Y-m-d H:i:s'),
                 'updatedAt' => null,
@@ -68,16 +97,23 @@ class WbpProductTabsApiController extends AbstractController
                 'id' => $id,
                 'productId' => $params['productId'],
                 'position' => 2,
-                'tabsName' => 'Reviews',
-                'data' => null,
+                'name' => $this->translationHelper->adjustTranslations([
+                    'de-DE' => 'Reviews DE',
+                    'en-GB' => 'Reviews EN'
+                ]),
+                'description' => $this->translationHelper->adjustTranslations([
+                    'de-DE' => '',
+                    'en-GB' => '',
+                ]),
                 'isEnabled' => 1,
                 'createdAt' => date('Y-m-d H:i:s'),
                 'updatedAt' => null,
             ]
         ], $context);
 
+
         return new JsonResponse([
-            'success' => 'Default tabs created'
+            'success' => 'ok'
         ]);
     }
 
@@ -136,7 +172,7 @@ class WbpProductTabsApiController extends AbstractController
     {
         $params = $request->request->all();
 
-        if (is_null($params['newTab']['tabsName']) || is_null($params['newTab']['data']) || is_null($params['newTab']['productId'])) {
+        if (is_null($params['newTab']['name']) || is_null($params['newTab']['description']) || is_null($params['newTab']['productId'])) {
             return new JsonResponse([
                 'state' => 'failed',
                 'error' => 'Configuration invalid'
@@ -156,8 +192,14 @@ class WbpProductTabsApiController extends AbstractController
                 'id' => $id,
                 'productId' => $params['newTab']['productId'],
                 'position' => ++$element->position,
-                'tabsName' => $params['newTab']['tabsName'],
-                'data' => $params['newTab']['data'],
+                'name' => $this->translationHelper->adjustTranslations([
+                    'de-DE' => $params['newTab']['name'] . ' DE',
+                    'en-GB' => $params['newTab']['name'] . ' EN'
+                ]),
+                'description' => $this->translationHelper->adjustTranslations([
+                    'de-DE' => $params['newTab']['description'] . ' DE',
+                    'en-GB' => $params['newTab']['description'] . ' EN',
+                ]),
                 'isEnabled' => 1,
                 'createdAt' => date('Y-m-d H:i:s'),
                 'updatedAt' => null,
@@ -166,7 +208,7 @@ class WbpProductTabsApiController extends AbstractController
 
 
         return new JsonResponse([
-            'success' => 'Ok'
+            'success' => $params
         ]);
     }
 
@@ -236,21 +278,28 @@ class WbpProductTabsApiController extends AbstractController
             ]);
         }
 
+
+
+        $name = $params['tab']['tabsName'];
+        $description = $params['tab']['data'];
+        $id = $params['tab']['id'];
+        $langId = strtoupper($params['tab']['langId']);
+
         $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('id', $params['tab']['id']));
-        $tabsId = $this->productTabsRepository->searchIds($criteria, $context)->firstId();
+        $criteria->addFilter(new EqualsFilter('id', $id));
+        $id = $this->productTabsRepository->searchIds($criteria, $context)->firstId();
 
         $this->productTabsRepository->update([
             [
-                'id' => $tabsId,
-                'tabsName' => $params['tab']['tabsName'],
-                'data' => $params['tab']['data']
+                'id' => $id,
+                'name' => $name,
+                'description' => $description
             ]
         ], $context);
 
 
         return new JsonResponse([
-            'success' => 'Visibility changed'
+            'success' => ''
         ]);
     }
 

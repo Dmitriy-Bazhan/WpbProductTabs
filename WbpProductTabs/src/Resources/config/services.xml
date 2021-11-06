@@ -10,6 +10,10 @@
             <tag name="shopware.entity.definition" entity="wbp_product_tabs" />
         </service>
 
+        <service id="WbpProductTabs\Core\Content\WbpProductTabs\Aggregate\WbpProductTabsTranslation\WbpProductTabsTranslationDefinition">
+            <tag name="shopware.entity.definition" entity="wbp_product_tabs_translation" />
+        </service>
+
         <!-- Subscribers -->
         <service id="WbpProductTabs\Subscriber\WbpProductTabsSubscriber">
             <argument type="service" id="wbp_product_tabs.repository"/>
@@ -20,7 +24,9 @@
 
         <!-- Controllers -->
         <service id="WbpProductTabs\Controller\Api\WbpProductTabsApiController" public="true">
+            <argument type="service" id="service_container"/>
             <argument type="service" id="wbp_product_tabs.repository"/>
+            <argument type="service" id="Doctrine\DBAL\Connection"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
@@ -30,6 +36,7 @@
             <argument type="service" id="wbp_product_tabs.repository"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
+
             </call>
         </service>
 
