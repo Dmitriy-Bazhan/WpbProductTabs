@@ -1,5 +1,5 @@
-import ApiService from 'src/core/service/api.service';
-
+//import ApiService from 'src/core/service/api.service'; from old vresion Shopware 6
+const {ApiService} = Shopware.Classes;
 /**
  * @private
  */
