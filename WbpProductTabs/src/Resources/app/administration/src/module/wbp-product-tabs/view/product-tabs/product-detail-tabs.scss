@@ -2,7 +2,12 @@
 @import "~scss/mixins";
 
 .sw-card {
-  margin: 0 200px;
+  margin: 0 0;
+  max-width: 90%;
+
+  .sw-data-grid {
+    overflow: auto !important;;
+  }
 }
 
 .wbp_product_tabs_list_toolbar_wrapper {
@@ -12,15 +17,17 @@
 
   .sw-card__content {
 
-    width: 1200px !important;
+    width: 100% !important;
   }
+
 }
 
 .product-tabs-add-new-tab-button {
   color: #0e82ff;
   border: #0e82ff;
 }
-.product-tabs-arrow-block  {
+
+.product-tabs-arrow-block {
   width: 100%;
   text-align: right;
 }
@@ -29,6 +36,7 @@
   font-size: 16px;
   font-weight: 700;
 }
+
 .sw-data-grid__cell--data {
   width: 500px;
   max-width: 500px;
